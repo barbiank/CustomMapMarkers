@@ -60,6 +60,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     @Override
                     public void onMarkerDrag(Marker marker) {
+
+                    }
+
+                    @Override
+                    public void onMarkerDragEnd(Marker marker) {
                         marker.getPosition();
                         double lat = marker.getPosition().latitude;
                         double longi = marker.getPosition().longitude;
@@ -74,14 +79,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             }
                             String count = addresses.get(0).getCountryName();
                             cnt.setText(count);
-                        }catch (IOException e1) {
-                                e1.printStackTrace();
-                            }
-                    }
-
-                    @Override
-                    public void onMarkerDragEnd(Marker marker) {
-
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
                     }
                 });
                 LatLng place = new LatLng(Double.parseDouble(lat.getText().toString()),Double.parseDouble(longi.getText().toString()));
