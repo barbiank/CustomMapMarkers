@@ -25,6 +25,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -40,7 +41,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -50,8 +50,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //get entered latitude
                 lat = findViewById(R.id.lat);
+                //get entered longitude
                 longi = findViewById(R.id.longi);
+                //update location after dragging marker
                 mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
                     @Override
                     public void onMarkerDragStart(Marker marker) {
@@ -77,40 +80,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 for (int i = 0; i < addresses.get(0).getMaxAddressLineIndex(); i++)
                                     add += addresses.get(0).getAddressLine(i) + "\n";
                             }
-                            if (addresses.size()>0) {
+                            if (addresses.size() > 0) {
                                 String count = addresses.get(0).getCountryName();
                                 cnt.setText(count);
-                            }
-                            else
+                            } else
                                 cnt.setText("WATER");
                         } catch (IOException e1) {
                             e1.printStackTrace();
                         }
                     }
                 });
-                LatLng place = new LatLng(Double.parseDouble(lat.getText().toString()),Double.parseDouble(longi.getText().toString()));
-                mMap.addMarker(new MarkerOptions().position(place).title("BOOM").draggable(true).icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons("test",75,75))));
+                Random rand = new Random();
+                Double r = rand.nextDouble();
+                LatLng place = new LatLng(Double.parseDouble(lat.getText().toString()), Double.parseDouble(longi.getText().toString()));
+                if (r > .5)
+                    mMap.addMarker(new MarkerOptions().position(place).draggable(true).icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons("test", 75, 75))));
+                else
+                    mMap.addMarker(new MarkerOptions().position(place).draggable(true).icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons("taco", 75, 75))));
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(place));
                 cnt = findViewById(R.id.country);
+                //get locations using geoCoder
                 Geocoder geoCoder = new Geocoder(getBaseContext(), Locale.getDefault());
                 try {
                     List<Address> addresses = geoCoder.getFromLocation(Double.parseDouble(lat.getText().toString()), Double.parseDouble(longi.getText().toString()), 1);
-
-                    String add = "";
-                    if (addresses.size() > 0)
-                    {
-                        for (int i=0; i<addresses.get(0).getMaxAddressLineIndex();i++)
-                            add += addresses.get(0).getAddressLine(i) + "\n";
-                    }
-
                     if (addresses.size()>0) {
-                        String count = addresses.get(0).getCountryName();
+                        String count = addresses.get(0).getLocality() + ", "  +addresses.get(0).getCountryName();
                         cnt.setText(count);
                     }
                     else
                         cnt.setText("WATER");
                 }
-                catch (IOException e1) {
+                catch (IOException | IllegalArgumentException e1) {
                     e1.printStackTrace();
                 }
 
@@ -120,6 +120,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
     }
+    //see https://stackoverflow.com/questions/14851641/change-marker-size-in-google-maps-api-v2
     public Bitmap resizeMapIcons(String iconName, int width, int height){
         Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(),getResources().getIdentifier(iconName, "drawable", getPackageName()));
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false);
@@ -140,7 +141,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
