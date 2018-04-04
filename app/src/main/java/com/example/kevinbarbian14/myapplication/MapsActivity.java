@@ -77,8 +77,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 for (int i = 0; i < addresses.get(0).getMaxAddressLineIndex(); i++)
                                     add += addresses.get(0).getAddressLine(i) + "\n";
                             }
-                            String count = addresses.get(0).getCountryName();
-                            cnt.setText(count);
+                            if (addresses.size()>0) {
+                                String count = addresses.get(0).getCountryName();
+                                cnt.setText(count);
+                            }
+                            else
+                                cnt.setText("WATER");
                         } catch (IOException e1) {
                             e1.printStackTrace();
                         }
@@ -98,8 +102,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         for (int i=0; i<addresses.get(0).getMaxAddressLineIndex();i++)
                             add += addresses.get(0).getAddressLine(i) + "\n";
                     }
-                    String count = addresses.get(0).getCountryName();
-                    cnt.setText(count);
+
+                    if (addresses.size()>0) {
+                        String count = addresses.get(0).getCountryName();
+                        cnt.setText(count);
+                    }
+                    else
+                        cnt.setText("WATER");
                 }
                 catch (IOException e1) {
                     e1.printStackTrace();
